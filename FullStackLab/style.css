@@ -1,0 +1,259 @@
+
+/* Global styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #243247;
+    background: #f5f7fb;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.section {
+    padding: 60px 0;
+}
+
+/* Header and navigation */
+.site-header {
+    background: #172b4d;
+    color: white;
+    padding: 20px 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.site-header h1 {
+    font-size: 24px;
+}
+
+nav {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #63d5ff;
+}
+
+/* Hero section */
+.hero {
+    background: #e7f0ff;
+    padding: 70px 0;
+}
+
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-text h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    margin-bottom: 25px;
+}
+
+.hero img {
+    width: 45%;
+    height: auto;
+    border-radius: 12px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #1769e0;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background: #104da6;
+}
+
+/* Course cards */
+.course-grid {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1 1 250px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #dce4ef;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h3 {
+    color: #1769e0;
+    margin-bottom: 15px;
+}
+
+.card p {
+    margin-bottom: 15px;
+}
+
+/* Course table */
+.table-title {
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #dce4ef;
+    text-align: left;
+}
+
+th {
+    background: #172b4d;
+    color: white;
+}
+
+/* Registration form */
+.registration {
+    background: #e7f0ff;
+}
+
+.registration h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+form {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input, select {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #b8c6d9;
+    border-radius: 6px;
+    font: inherit;
+}
+
+input:focus, select:focus {
+    outline: 2px solid #1769e0;
+    outline-offset: 2px;
+}
+
+form .btn {
+    width: 100%;
+}
+
+/* Footer */
+footer {
+    background: #172b4d;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav {
+        justify-content: center;
+    }
+
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-text h2 {
+        font-size: 28px;
+    }
+
+    .hero img {
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .course-grid {
+        flex-direction: column;
+    }
+
+    .card {
+        flex-basis: auto;
+    }
+
+    .section {
+        padding: 40px 0;
+    }
+}

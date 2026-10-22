@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Student Course Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container header-content">
+            <h1>Student Course Portal</h1>
+
+            <nav aria-label="Main navigation">
+                <a href="#about">About</a>
+                <a href="#courses">Courses</a>
+                <a href="#register">Register</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero" id="about">
+            <div class="container hero-content">
+
+                <div class="hero-text">
+                    <h2>Welcome to My Learning Journey</h2>
+                    <p>
+                        Explore programming, web development
+                        and modern technology through
+                        exciting courses.
+                    </p>
+
+                    <a class="btn" href="#courses">
+                        Explore Courses
+                    </a>
+                </div>
+
+                <img
+                    src="https://placehold.co/500x320/png"
+                    alt="Placeholder illustration for online learning">
+            </div>
+        </section>
+
+        <section class="container section" id="courses">
+            <h2>Available Courses</h2>
+            <p>Choose a course to start learning.</p>
+
+            <div class="course-grid">
+
+                <article class="card">
+                    <h3>HTML5</h3>
+                    <p>
+                        Learn to structure websites
+                        using semantic HTML.
+                    </p>
+                    <span>Duration: 2 Weeks</span>
+                </article>
+
+                <article class="card">
+                    <h3>CSS3</h3>
+                    <p>
+                        Learn styling, Flexbox and
+                        responsive layouts.
+                    </p>
+                    <span>Duration: 3 Weeks</span>
+                </article>
+
+                <article class="card">
+                    <h3>JavaScript</h3>
+                    <p>
+                        Make websites interactive
+                        using JavaScript.
+                    </p>
+                    <span>Duration: 4 Weeks</span>
+                </article>
+
+            </div>
+
+            <h3 class="table-title">Course Overview</h3>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Duration</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>HTML</td>
+                            <td>2 Weeks</td>
+                            <td>Beginner</td>
+                        </tr>
+                        <tr>
+                            <td>CSS</td>
+                            <td>3 Weeks</td>
+                            <td>Beginner</td>
+                        </tr>
+                        <tr>
+                            <td>JavaScript</td>
+                            <td>4 Weeks</td>
+                            <td>Intermediate</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="registration section" id="register">
+            <div class="container">
+                <h2>Course Registration</h2>
+
+                <form action="#" method="get">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name"
+                           name="name" required>
+
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email"
+                           name="email" required>
+
+                    <label for="course">Select Course</label>
+                    <select id="course" name="course" required>
+                        <option value="">Choose a course</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="js">JavaScript</option>
+                    </select>
+
+                    <button type="submit" class="btn">
+                        Register Now
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Student Course Portal | 2026</p>
+    </footer>
+
+</body>
+</html>
