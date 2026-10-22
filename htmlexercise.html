@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Student Course Portal</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>Student Course Portal</h1>
+        <p>Welcome to my student profile and courses!</p>
+
+        <nav>
+            <a href="#about">About</a> |
+            <a href="#courses">Courses</a> |
+            <a href="#register">Register</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section id="about">
+            <h2>About Me</h2>
+            <p>
+                I am a Computer Science student
+                interested in programming,
+                web development and technology.
+            </p>
+
+            <h3>My Interests</h3>
+            <ul>
+                <li>Web Development</li>
+                <li>Data Structures</li>
+                <li>Artificial Intelligence</li>
+            </ul>
+
+            <img
+                src="https://placehold.co/300x180/png"
+                alt="Placeholder image representing a student profile"
+                width="300">
+        </section>
+
+        <section id="courses">
+            <h2>Available Courses</h2>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Duration</th>
+                        <th>Level</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>HTML</td>
+                        <td>2 Weeks</td>
+                        <td>Beginner</td>
+                    </tr>
+                    <tr>
+                        <td>CSS</td>
+                        <td>3 Weeks</td>
+                        <td>Beginner</td>
+                    </tr>
+                    <tr>
+                        <td>JavaScript</td>
+                        <td>4 Weeks</td>
+                        <td>Intermediate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="register">
+            <h2>Course Registration</h2>
+
+            <form action="#" method="get">
+
+                <label for="name">Name:</label>
+                <input type="text" id="name"
+                       name="name" required>
+
+                <br><br>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email"
+                       name="email" required>
+
+                <br><br>
+
+                <label for="course">Select Course:</label>
+                <select id="course" name="course" required>
+                    <option value="">Choose a course</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="js">JavaScript</option>
+                </select>
+
+                <br><br>
+
+                <button type="submit">Submit</button>
+
+            </form>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Student Course Portal | 2026</p>
+    </footer>
+
+</body>
+</html>
