@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile & Course Information</title>
+</head>
+<body>
+
+    <!-- Header containing page title and navigation -->
+    <header>
+        <h1>Student Profile & Course Information Portal</h1>
+        <nav>
+            <ul>
+                <li><a href="#profile-section">Student Profile</a></li>
+                <li><a href="#course-section">Course Details</a></li>
+                <li><a href="#contact-section">Contact & Registration</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- Main Content Section -->
+    <main>
+        
+        <!-- Student Profile Section containing headings, text, and an image -->
+        <section id="profile-section">
+            <h2>About the Student</h2>
+            <p>Welcome to my student profile page. This page contains introductory academic information alongside relevant details regarding my current enrollment status, program tracks, and overall career goals.</p>
+            
+            <h3>Academic Background</h3>
+            <p>Currently pursuing studies in Information Technology and Web Development platforms. The primary focus involves mastering fundamental structure sets, semantic documents, styling frameworks, and clean code principles.</p>
+            
+            <!-- Image with meaningful alt text and a custom title attribute -->
+            <div>
+                <img src="student_photo.jpg" alt="Official headshot photo of the student for the profile dashboard" title="Student Profile Picture" width="200">
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Course Information Section with lists and choices -->
+        <section id="course-section">
+            <h2>Current Course Track Selection</h2>
+            <p>Below is a quick overview of primary focus tracks available for selection during the academic period:</p>
+            
+            <ul>
+                <li>Web Application Architectures</li>
+                <li>Front-End Engineering (HTML5, CSS3, JavaScript)</li>
+                <li>Database Management Systems</li>
+            </ul>
+
+            <!-- Radio Button Block to choose one path -->
+            <fieldset>
+                <legend>Select Your Core Track Area:</legend>
+                <label>
+                    <input type="radio" name="track" value="frontend" checked> Front-End Track
+                </label><br>
+                <label>
+                    <input type="radio" name="track" value="backend"> Back-End Track
+                </label><br>
+                <label>
+                    <input type="radio" name="track" value="fullstack"> Full-Stack Track
+                </label>
+            </fieldset>
+        </section>
+
+        <hr>
+
+        <!-- Form Section with specified inputs and validation patterns -->
+        <section id="contact-section">
+            <h2>Contact & Registration Form</h2>
+            <form action="#" method="POST">
+                
+                <div>
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                
+                <br>
+                
+                <div>
+                    <!-- Email field matching the hint in the prompt -->
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required placeholder="name@example.com">
+                </div>
+                
+                <br>
+                
+                <div>
+                    <label for="message">Additional Comments:</label><br>
+                    <textarea id="message" name="message" rows="4" cols="40" placeholder="Enter text here..."></textarea>
+                </div>
+                
+                <br>
+                
+                <div>
+                    <button type="submit">Submit Registration</button>
+                </div>
+                
+            </form>
+        </section>
+
+    </main>
+
+    <hr>
+
+    <!-- Footer containing copyright or author information -->
+    <footer>
+        <p>&copy; 2026 Student Learning Portal. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
