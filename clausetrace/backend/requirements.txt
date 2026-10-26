@@ -1,0 +1,12 @@
+# ClauseTrace Core Backend Dependencies (Streamlined Architecture)
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+sqlalchemy[asyncio]>=2.0.31
+greenlet>=3.0.0
+asyncpg>=0.29.0
+python-multipart>=0.0.9
+PyMuPDF>=1.24.5
+python-dotenv>=1.0.1
+google-genai>=1.0.0
