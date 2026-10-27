@@ -15,8 +15,8 @@ from sqlalchemy import (
     Index,
     String,
     Text,
+    Uuid,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import (
@@ -41,19 +41,19 @@ class Obligation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "obligations"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     contract_version_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("contract_versions.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     clause_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("clauses.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
@@ -78,7 +78,7 @@ class Obligation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         index=True,
     )
     assigned_to: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
@@ -96,4 +96,3 @@ class Obligation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<Obligation id={self.id} title={self.title} status={self.status} due={self.due_date}>"
-

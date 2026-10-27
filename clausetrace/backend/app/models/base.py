@@ -1,6 +1,6 @@
 """
-ClauseTrace Base Model and Enums
-SQLAlchemy 2.x declarative base and domain enums.
+ClauseTrace Base Model, Enums, and Shared Mixins.
+SQLAlchemy 2.x declarative base and domain enums with SQLite & PostgreSQL cross-compatibility.
 """
 
 from __future__ import annotations
@@ -10,11 +10,9 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, MetaData, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, MetaData, Uuid, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-# Standard naming conventions for constraints and indexes
 POSTGRES_NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -44,12 +42,11 @@ class TimestampMixin:
 
 
 class UUIDPrimaryKeyMixin:
-    """Provides a UUID v4 primary key."""
+    """Provides a cross-platform UUID v4 primary key."""
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=func.gen_random_uuid(),
         nullable=False,
     )
 
@@ -59,8 +56,10 @@ class UUIDPrimaryKeyMixin:
 # ============================================================================
 
 class UserRole(str, enum.Enum):
+    ADMIN = "ADMIN"
     ANALYST = "ANALYST"
     REVIEWER = "REVIEWER"
+    AUDITOR = "AUDITOR"
 
 
 class VersionStatus(str, enum.Enum):
@@ -139,4 +138,3 @@ class AuditAction(str, enum.Enum):
     OBLIGATION_CREATED = "OBLIGATION_CREATED"
     OBLIGATION_STATUS_CHANGED = "OBLIGATION_STATUS_CHANGED"
     DIFF_GENERATED = "DIFF_GENERATED"
-

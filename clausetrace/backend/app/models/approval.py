@@ -15,9 +15,9 @@ from sqlalchemy import (
     Index,
     String,
     Text,
+    Uuid,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import ApprovalDecision, Base, UUIDPrimaryKeyMixin
@@ -35,19 +35,19 @@ class Approval(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "approvals"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     contract_version_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("contract_versions.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     approver_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
         index=True,
@@ -79,4 +79,3 @@ class Approval(Base, UUIDPrimaryKeyMixin):
 
     def __repr__(self) -> str:
         return f"<Approval id={self.id} version={self.contract_version_id} decision={self.decision}>"
-

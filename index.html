@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberShield | Defensive Security & Ethical Hacking</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="brand">
+      <span class="shield-icon">&#9670;</span> CyberShield <span>Labs</span>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#courses">Tracks</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <span class="badge">2026 Security Curriculum</span>
+      <h1>Master Hands-On Cyber Defense & Ethical Hacking</h1>
+      <p>Train in live sandboxes, analyze real-world vulnerabilities, and earn certified credentials.</p>
+      <a href="#courses" class="hero-btn">Browse Training Tracks</a>
+    </div>
+  </section>
+
+  <!-- Main Course Cards Section -->
+  <main class="container" id="courses">
+    <div class="section-title">
+      <h2>Featured Security Tracks</h2>
+      <p>Select a specialization to inspect curriculum details or enroll directly.</p>
+    </div>
+
+    <!-- 3 Flexbox Cards -->
+    <div class="card-container">
+
+      <!-- Card 1 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80" alt="Cybersecurity hardware and data networks">
+          <span class="card-tag beginner">Beginner</span>
+        </div>
+        <div class="card-body">
+          <div class="course-meta">8 Weeks &bull; 24 Live Labs</div>
+          <h3>Network Defense & Packet Analysis</h3>
+          <p>Learn Wireshark, firewall configurations, and intrusion detection systems to protect enterprise infrastructure.</p>
+          <div class="card-footer">
+            <span class="price">$199</span>
+            <button class="btn" onclick="openModal('Network Defense & Packet Analysis', '8 Weeks', '24 Labs', 'Wireshark, Snort, Linux CLI, Firewall Rules')">Enroll Now</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80" alt="Code security and vulnerability hunting">
+          <span class="card-tag intermediate">Intermediate</span>
+        </div>
+        <div class="card-body">
+          <div class="course-meta">10 Weeks &bull; 30 Live Labs</div>
+          <h3>Ethical Hacking & Web Penetration</h3>
+          <p>Uncover OWASP Top 10 vulnerabilities, conduct SQL injection exploits, and patch server-side weaknesses safely.</p>
+          <div class="card-footer">
+            <span class="price">$249</span>
+            <button class="btn" onclick="openModal('Ethical Hacking & Web Penetration', '10 Weeks', '30 Labs', 'OWASP Top 10, Burp Suite, SQL Injection, Kali Linux')">Enroll Now</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=80" alt="Digital padlock and encryption key">
+          <span class="card-tag advanced">Advanced</span>
+        </div>
+        <div class="card-body">
+          <div class="course-meta">12 Weeks &bull; Capstone Project</div>
+          <h3>Digital Forensics & Malware Defense</h3>
+          <p>Analyze reverse-engineered binary samples, trace malicious memory dumps, and build incident response playbooks.</p>
+          <div class="card-footer">
+            <span class="price">$299</span>
+            <button class="btn" onclick="openModal('Digital Forensics & Malware Defense', '12 Weeks', 'Capstone Project', 'Ghidra, Memory Forensics, Threat Hunting, Incident Handling')">Enroll Now</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Interactive Modal Dialog -->
+  <div id="courseModal" class="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <span class="modal-tag">Course Enrollment</span>
+      <h3 id="modalTitle">Course Title</h3>
+      <div class="modal-details">
+        <p><strong>Duration:</strong> <span id="modalDuration"></span></p>
+        <p><strong>Practical Labs:</strong> <span id="modalLabs"></span></p>
+        <p><strong>Core Toolkit:</strong> <span id="modalTools"></span></p>
+      </div>
+      <div class="modal-status" id="modalStatus">Live Sandboxes Available &bull; Instant Access</div>
+      <button class="btn btn-confirm" onclick="confirmEnrollment()">Confirm Registration</button>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <section class="about-section" id="about">
+    <div class="about-container">
+      <h2>Why Train With CyberShield?</h2>
+      <div class="perks-row">
+        <div class="perk-item">
+          <h4>Browser Sandboxes</h4>
+          <p>No software installation required. Practice on virtual Linux targets directly inside your browser.</p>
+        </div>
+        <div class="perk-item">
+          <h4>Industry Mentorship</h4>
+          <p>Weekly code & architecture reviews with active red and blue team engineers.</p>
+        </div>
+        <div class="perk-item">
+          <h4>Accredited Badge</h4>
+          <p>Verified digital certificates verifiable on LinkedIn and recognized by top tech employers.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact & Newsletter Section (No generic copyright) -->
+  <section class="contact-section" id="contact">
+    <div class="contact-box">
+      <h3>Have Questions or Need Team Access?</h3>
+      <p>Send an inquiry to get matched with an instructor within 24 hours.</p>
+      <form class="contact-form" onsubmit="handleInquiry(event)">
+        <input type="email" id="emailInput" placeholder="Enter your academic or work email" required>
+        <button type="submit" class="btn">Get Syllabus</button>
+      </form>
+      <p id="inquiryMessage" class="feedback-msg"></p>
+    </div>
+  </section>
+
+  <!-- Simple functional footer without generic copyright boilerplate -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">CyberShield Labs &bull; Defensive Academy</div>
+      <div class="footer-links">
+        <a href="#home">Back to Top &uarr;</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Simple interactive script so every button functions -->
+  <script>
+    function openModal(title, duration, labs, tools) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalDuration').textContent = duration;
+      document.getElementById('modalLabs').textContent = labs;
+      document.getElementById('modalTools').textContent = tools;
+      document.getElementById('modalStatus').textContent = "Live Sandboxes Available • Instant Access";
+      document.getElementById('modalStatus').style.color = "#059669";
+      document.getElementById('courseModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('courseModal').classList.remove('active');
+    }
+
+    function closeModalOnBackdrop(event) {
+      if (event.target.id === 'courseModal') {
+        closeModal();
+      }
+    }
+
+    function confirmEnrollment() {
+      const status = document.getElementById('modalStatus');
+      status.textContent = "✓ Enrollment Confirmed! Sandbox invite sent.";
+      status.style.color = "#0284c7";
+      setTimeout(closeModal, 1500);
+    }
+
+    function handleInquiry(e) {
+      e.preventDefault();
+      const input = document.getElementById('emailInput');
+      const msg = document.getElementById('inquiryMessage');
+      if (input.value) {
+        msg.textContent = "✓ Complete syllabus sent to " + input.value;
+        input.value = "";
+      }
+    }
+  </script>
+</body>
+</html>

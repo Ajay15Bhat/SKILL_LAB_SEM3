@@ -1,6 +1,5 @@
 """
-ClauseTrace Audit Trail Model.
-Append-only log for the visual audit timeline.
+ClauseTrace Append-Only Audit Trail Model.
 """
 
 from __future__ import annotations
@@ -13,26 +12,33 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    JSON,
     String,
+    Uuid,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import AuditAction, Base, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.models.auth import User
+    from app.models.auth import Organization, User
 
 
 class AuditLog(Base, UUIDPrimaryKeyMixin):
     """
-    Append-only audit trail capturing all uploads, evaluations, and reviewer actions.
+    Append-only audit trail capturing all uploads, evaluations, diffs, and reviewer actions.
     """
     __tablename__ = "audit_logs"
 
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
@@ -48,14 +54,21 @@ class AuditLog(Base, UUIDPrimaryKeyMixin):
         index=True,
     )
     entity_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         nullable=False,
         index=True,
     )
-    details: Mapped[Dict[str, Any]] = mapped_column(
-        JSONB,
-        default=dict,
-        nullable=False,
+    metadata_before: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+    metadata_after: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+    ip_address: Mapped[Optional[str]] = mapped_column(
+        String(45),
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -65,6 +78,11 @@ class AuditLog(Base, UUIDPrimaryKeyMixin):
     )
 
     user: Mapped[Optional["User"]] = relationship("User")
+
+    __table_args__ = (
+        Index("ix_audit_org_action_time", "organization_id", "action", "created_at"),
+        Index("ix_audit_entity", "entity_type", "entity_id"),
+    )
 
     def __repr__(self) -> str:
         return f"<AuditLog id={self.id} action={self.action} entity={self.entity_type}:{self.entity_id}>"
