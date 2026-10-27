@@ -5,8 +5,11 @@
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.13-blue)](clausetrace/backend)
 [![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014%20%7C%20React%20%7C%20Tailwind-black)](clausetrace/frontend)
 [![Database](https://img.shields.io/badge/Database-SQLite%20%2F%20Supabase%20Postgres-336791)](clausetrace/backend/app/models)
+[![PRD](https://img.shields.io/badge/Documentation-Product%20Requirements%20(PRD)-purple)](PRD.md)
 
 ClauseTrace is an enterprise-grade contract review and change-impact management system. It allows organizations to upload successive revisions of vendor service agreements, define compliance requirements, inspect extracted clauses with page-level provenance, compare revisions with word-level textual diffing, track operational obligations with overdue warnings, and manage approval state transitions with cryptographic signatures.
+
+> 📄 **Product Specifications**: For the formal architectural invariants, user personas, module breakdowns, and compliance workflows, see the complete [Product Requirements Document (PRD.md)](PRD.md).
 
 ---
 
