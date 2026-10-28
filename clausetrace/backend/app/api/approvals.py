@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.user_helper import ensure_demo_users
 from app.models.audit import AuditLog
 from app.models.base import ApprovalDecision, AuditAction, VersionStatus
 from app.models.contract import ContractVersion
@@ -31,6 +32,7 @@ async def approve_version(
     - Generates a non-repudiation cryptographic signature hash.
     - Records sign-off in the audit trail.
     """
+    await ensure_demo_users(db)
     version = await db.get(ContractVersion, version_id)
     if not version:
         raise HTTPException(status_code=404, detail="Contract version not found")

@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.user_helper import ensure_demo_users
 from app.models.audit import AuditLog
 from app.models.base import AuditAction, ReviewStatus
 from app.models.contract import ContractVersion
@@ -33,6 +34,7 @@ async def create_requirement(
     db: AsyncSession = Depends(get_db),
 ):
     """Creates a new compliance requirement rule."""
+    await ensure_demo_users(db)
     req = Requirement(
         title=payload.title,
         category=payload.category,

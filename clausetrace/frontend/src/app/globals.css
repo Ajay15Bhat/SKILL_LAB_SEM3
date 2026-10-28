@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #060f0b;
+  --foreground: #e2e8f0;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(42, 95, 71, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(190, 135, 67, 0.12) 0%, transparent 45%);
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: rgba(17, 41, 30, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(190, 135, 67, 0.2);
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(190, 135, 67, 0.45);
+  box-shadow: 0 8px 30px rgba(6, 15, 11, 0.6);
+}
+
+.bronze-gradient-text {
+  background: linear-gradient(135deg, #faedd4 0%, #d9a15b 50%, #be8743 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bronze-btn {
+  background: linear-gradient(135deg, #d9a15b 0%, #be8743 100%);
+  color: #0c1d15;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.bronze-btn:hover {
+  box-shadow: 0 0 20px rgba(190, 135, 67, 0.4);
+  transform: translateY(-1px);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(12, 29, 21, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(190, 135, 67, 0.35);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(190, 135, 67, 0.6);
+}

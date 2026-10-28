@@ -57,7 +57,7 @@ class Contract(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     def __repr__(self) -> str:
-        return f"<Contract id={self.id} title={self.title} vendor={self.vendor_name}>"
+        return f"<Contract id={self.__dict__.get('id')} title={self.__dict__.get('title')} vendor={self.__dict__.get('vendor_name')}>"
 
 
 class ContractVersion(Base, UUIDPrimaryKeyMixin):
@@ -114,6 +114,10 @@ class ContractVersion(Base, UUIDPrimaryKeyMixin):
     findings: Mapped[List["Finding"]] = relationship(
         "Finding", back_populates="version", cascade="all, delete-orphan"
     )
+
+    @property
+    def clause_count(self) -> int:
+        return len(self.clauses) if "clauses" in self.__dict__ else 0
 
     __table_args__ = (
         UniqueConstraint("contract_id", "version_number", name="uq_contract_version"),

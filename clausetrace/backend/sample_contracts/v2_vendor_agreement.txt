@@ -1,0 +1,18 @@
+=== MASTER SERVICES AGREEMENT (VERSION 2.0) ===
+[NOTE: Section 3 altered from 30 days to 60 days + termination penalty]
+
+Section 1: Scope of Managed Cloud Services
+CloudScale Corp agrees to provide 99.9% uptime managed cloud infrastructure, automated incremental snapshot storage, enterprise cybersecurity monitoring, and Tier-1 support to DataVault Inc.
+
+Section 2: Payment Terms and Billing Invoicing
+All invoices issued under this Agreement shall be due and payable within forty-five (45) calendar days from electronic transmission. Delinquent balances shall accrue interest at 2.0% per month.
+
+Section 3: Termination for Convenience and Notice Period
+Either party may terminate this Agreement without cause only by providing at least sixty (60) days prior written notice to the other party, subject to a mandatory early termination fee equal to two (2) months of average recurring charges.
+
+Section 4: Limitation of Liability and Damages Cap
+Neither party shall be liable for indirect, incidental, special, or consequential damages. The aggregate liability of either party under this Agreement shall not exceed the total fees paid by Customer in the preceding six (6) months.
+
+Section 5: Governing Law, Venue, and Dispute Resolution
+This Agreement shall be governed by and construed under the laws of the State of Delaware. Any dispute arising out of this Agreement shall be resolved through binding arbitration in Wilmington, Delaware.
+

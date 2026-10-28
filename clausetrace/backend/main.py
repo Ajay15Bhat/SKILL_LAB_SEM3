@@ -3,7 +3,11 @@ ClauseTrace Core Backend Application Entrypoint.
 FastAPI REST API with interactive Swagger documentation.
 """
 
-from fastapi import FastAPI
+from pathlib import Path
+import traceback
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.approvals import router as approvals_router
@@ -29,6 +33,20 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Detailed error handler to display exact causes in Swagger UI instead of opaque 500
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    err_trace = traceback.format_exc()
+    print(f"\n[SERVER ERROR] {request.method} {request.url}: {exc}\n{err_trace}\n")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error_type": type(exc).__name__,
+            "message": str(exc),
+            "hint": "Check database connection or input parameters.",
+        },
+    )
+
 # CORS Configuration for Next.js Frontend
 app.add_middleware(
     CORSMiddleware,
@@ -50,6 +68,24 @@ app.include_router(approvals_router, prefix=settings.API_V1_STR)
 app.include_router(audit_router, prefix=settings.API_V1_STR)
 
 
+# Mount Static Frontend Assets
+static_dir = Path(__file__).parent / "app" / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+
+@app.get("/app", response_class=FileResponse, tags=["Frontend"])
+async def serve_frontend_app():
+    """Serves the ClauseTrace Forest Green & Bronze Visual Dashboard."""
+    return FileResponse(static_dir / "index.html")
+
+
+@app.get("/", tags=["Frontend"])
+async def root():
+    """Root endpoint serving the Visual Dashboard."""
+    return FileResponse(static_dir / "index.html")
+
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Health check endpoint confirming API is running."""
@@ -57,15 +93,5 @@ async def health_check():
         "status": "healthy",
         "app": settings.PROJECT_NAME,
         "environment": settings.ENVIRONMENT,
-    }
-
-
-@app.get("/", tags=["Health"])
-async def root():
-    """Root endpoint redirecting to interactive documentation."""
-    return {
-        "message": f"Welcome to {settings.PROJECT_NAME} API",
-        "documentation": "/docs",
-        "version": "1.0.0",
     }
 

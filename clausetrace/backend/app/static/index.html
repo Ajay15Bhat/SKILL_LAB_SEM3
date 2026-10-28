@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClauseTrace — Contract Review & Change Impact</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            forest: {
+              950: '#060f0b',
+              900: '#0c1d15',
+              850: '#11291e',
+              800: '#173628',
+              700: '#204a37',
+              600: '#2a5f47',
+              500: '#387c5e',
+              400: '#4da17b',
+            },
+            bronze: {
+              900: '#422e17',
+              800: '#5e4120',
+              700: '#7d5729',
+              600: '#9e6e34',
+              500: '#be8743',
+              400: '#d9a15b',
+              300: '#eac082',
+              200: '#f4dcab',
+              100: '#faedd4',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #060f0b;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(42, 95, 71, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(190, 135, 67, 0.12) 0%, transparent 45%);
+    }
+    .glass-card {
+      background: rgba(17, 41, 30, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(190, 135, 67, 0.2);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(190, 135, 67, 0.45);
+      box-shadow: 0 8px 30px rgba(6, 15, 11, 0.6);
+    }
+    .bronze-gradient-text {
+      background: linear-gradient(135deg, #faedd4 0%, #d9a15b 50%, #be8743 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bronze-btn {
+      background: linear-gradient(135deg, #d9a15b 0%, #be8743 100%);
+      color: #0c1d15;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .bronze-btn:hover {
+      box-shadow: 0 0 20px rgba(190, 135, 67, 0.4);
+      transform: translateY(-1px);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(12, 29, 21, 0.8); }
+    ::-webkit-scrollbar-thumb { background: rgba(190, 135, 67, 0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(190, 135, 67, 0.6); }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-bronze-500 selection:text-forest-950">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="border-b border-bronze-500/20 bg-forest-950/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-forest-700 to-forest-900 border border-bronze-400/40 flex items-center justify-center shadow-lg shadow-forest-950/50">
+          <i data-lucide="scale" class="w-5 h-5 text-bronze-300"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight bronze-gradient-text">ClauseTrace</span>
+          <span class="text-xs text-forest-400 ml-2 px-2 py-0.5 rounded-full border border-forest-600/30 bg-forest-900/60 font-mono">v1.0 MVP</span>
+        </div>
+      </div>
+
+      <!-- Center Status & Role Badge -->
+      <div class="hidden md:flex items-center gap-3">
+        <div class="flex items-center gap-2 px-3 py-1 rounded-md bg-forest-900/80 border border-forest-700/40 text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-forest-400">PostgreSQL FTS + Gemini Flash Active</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-bronze-900/40 border border-bronze-500/30 text-bronze-300 text-xs font-medium">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-bronze-400"></i>
+          <span>Persona: Reviewer & Analyst</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <button id="load-demo-btn" onclick="seedDemoContract()" class="text-xs text-bronze-200 bg-forest-900/80 hover:bg-forest-800 border border-bronze-500/40 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-bronze-400"></i>
+          <span>Load Demo Contract</span>
+        </button>
+        <a href="/docs" target="_blank" class="text-xs text-bronze-300 hover:text-bronze-200 flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-forest-900/60 border border-transparent hover:border-bronze-500/30 transition">
+          <i data-lucide="code-2" class="w-4 h-4"></i>
+          <span class="font-mono">Swagger API</span>
+        </a>
+        <button onclick="openNewContractModal()" class="bronze-btn px-4 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>New Contract</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Top Stats / Overview Bar -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="glass-card rounded-xl p-4 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-lg bg-forest-900/90 border border-bronze-500/20 flex items-center justify-center text-bronze-400">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-forest-400 font-medium uppercase tracking-wider">Contracts</div>
+          <div id="stat-contracts-count" class="text-xl font-bold text-slate-100">0</div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-lg bg-forest-900/90 border border-bronze-500/20 flex items-center justify-center text-emerald-400">
+          <i data-lucide="check-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-forest-400 font-medium uppercase tracking-wider">Approved Revisions</div>
+          <div id="stat-approved-count" class="text-xl font-bold text-slate-100">0</div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-lg bg-forest-900/90 border border-bronze-500/20 flex items-center justify-center text-bronze-300">
+          <i data-lucide="git-compare" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-forest-400 font-medium uppercase tracking-wider">Diff Engine</div>
+          <div class="text-xs font-semibold text-bronze-300 font-mono mt-0.5">difflib + Impact Flags</div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-lg bg-forest-900/90 border border-bronze-500/20 flex items-center justify-center text-amber-400">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-forest-400 font-medium uppercase tracking-wider">Guardrail Status</div>
+          <div class="text-xs font-semibold text-emerald-300 font-mono mt-0.5">Zero Silent Inheritance</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Contract Workspace Header -->
+    <div class="glass-card rounded-2xl p-6 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2.5 py-1 rounded-md bg-forest-900/90 text-bronze-300 border border-bronze-500/30 font-mono" id="active-contract-type">MSA</span>
+            <h1 class="text-2xl font-bold text-slate-100" id="active-contract-title">Loading Contracts...</h1>
+          </div>
+          <p class="text-xs text-forest-400 mt-1" id="active-contract-vendor">Select or create a contract to begin revision inspection</p>
+        </div>
+
+        <!-- Contract Selector & Version Badges -->
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="contract-selector" onchange="onContractSelected(this.value)" class="bg-forest-950 border border-bronze-500/30 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none focus:border-bronze-400">
+            <option value="">Select Contract...</option>
+          </select>
+
+          <!-- Upload Version Button -->
+          <button onclick="document.getElementById('pdf-file-input').click()" class="bronze-btn px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 shadow">
+            <i data-lucide="upload" class="w-4 h-4"></i>
+            <span>Upload New Version (PDF)</span>
+          </button>
+          <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="uploadSelectedPDF(this.files[0])">
+        </div>
+      </div>
+
+      <!-- Version Selector Tabs -->
+      <div class="mt-6 pt-5 border-t border-forest-800/60 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-2" id="version-chips-container">
+          <!-- Populated by JS: Version 1 (APPROVED), Version 2 (DRAFT) -->
+        </div>
+
+        <!-- Approval / Re-evaluate Actions -->
+        <div class="flex items-center gap-2" id="version-actions-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TABS: WORKSPACE & CLAUSES | COMPLIANCE RULES | DIFF VIEWER | AUDIT TIMELINE -->
+    <div class="flex items-center gap-2 border-b border-forest-800/80 mb-6 pb-2 overflow-x-auto">
+      <button onclick="switchTab('clauses')" id="tab-btn-clauses" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-bronze-300 border-b-2 border-bronze-400 bg-forest-900/40">
+        <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span>Clauses & Evidence (<span id="tab-clause-count">0</span>)</span>
+      </button>
+
+      <button onclick="switchTab('findings')" id="tab-btn-findings" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">
+        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+        <span>Compliance Findings (<span id="tab-finding-count">0</span>)</span>
+      </button>
+
+      <button onclick="switchTab('diff')" id="tab-btn-diff" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">
+        <i data-lucide="git-compare" class="w-4 h-4"></i>
+        <span>Version Diff & Change Impact</span>
+      </button>
+
+      <button onclick="switchTab('audit')" id="tab-btn-audit" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">
+        <i data-lucide="history" class="w-4 h-4"></i>
+        <span>Audit Trail Timeline</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: EXTRACTED CLAUSES -->
+    <div id="tab-content-clauses" class="tab-panel">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <span>Segmented Legal Clauses</span>
+          <span class="text-xs text-forest-400 font-normal">Indexed with PostgreSQL tsvector</span>
+        </h2>
+        <div class="flex items-center gap-2">
+          <input type="text" id="clause-search-input" onkeyup="filterClauses(this.value)" placeholder="Filter clauses by keyword..." class="bg-forest-950 border border-forest-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 w-64 outline-none focus:border-bronze-400">
+        </div>
+      </div>
+
+      <div class="space-y-3" id="clauses-list">
+        <div class="text-center py-12 text-forest-400 text-xs">Select or upload a contract version to inspect clauses.</div>
+      </div>
+    </div>
+
+    <!-- TAB 2: COMPLIANCE FINDINGS -->
+    <div id="tab-content-findings" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200">Compliance Rules & Grounded Findings</h2>
+          <p class="text-xs text-forest-400">Evaluated via PostgreSQL FTS Cover Density + Google Gemini Flash</p>
+        </div>
+        <button onclick="openNewRequirementModal()" class="text-xs bg-forest-900 hover:bg-forest-850 text-bronze-300 border border-bronze-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Requirement</span>
+        </button>
+      </div>
+
+      <div class="space-y-4" id="findings-list">
+        <div class="text-center py-12 text-forest-400 text-xs">No findings recorded for this version.</div>
+      </div>
+    </div>
+
+    <!-- TAB 3: VERSION DIFF & CHANGE IMPACT -->
+    <div id="tab-content-diff" class="tab-panel hidden">
+      <div class="glass-card rounded-xl p-5 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+              <i data-lucide="git-compare" class="w-4 h-4 text-bronze-400"></i>
+              <span>Revisions Diff Comparator</span>
+            </h2>
+            <p class="text-xs text-forest-400 mt-0.5">Select a baseline version and a target version to inspect alterations</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <select id="diff-v1-select" class="bg-forest-950 border border-forest-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 outline-none"></select>
+            <span class="text-xs text-forest-400">compare with</span>
+            <select id="diff-v2-select" class="bg-forest-950 border border-forest-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 outline-none"></select>
+            <button onclick="runDiffComparison()" class="bronze-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold">Compare</button>
+          </div>
+        </div>
+
+        <!-- Metrics Bar -->
+        <div id="diff-metrics-bar" class="hidden mt-4 pt-4 border-t border-forest-800/80 grid grid-cols-4 gap-3 text-center">
+          <div class="bg-forest-950/70 p-2 rounded-lg border border-forest-800">
+            <div class="text-[10px] uppercase text-forest-400">Additions</div>
+            <div id="metric-additions" class="text-base font-bold text-emerald-400">0</div>
+          </div>
+          <div class="bg-forest-950/70 p-2 rounded-lg border border-forest-800">
+            <div class="text-[10px] uppercase text-forest-400">Deletions</div>
+            <div id="metric-deletions" class="text-base font-bold text-rose-400">0</div>
+          </div>
+          <div class="bg-forest-950/70 p-2 rounded-lg border border-forest-800">
+            <div class="text-[10px] uppercase text-forest-400">Modified Clauses</div>
+            <div id="metric-modifications" class="text-base font-bold text-amber-400">0</div>
+          </div>
+          <div class="bg-forest-950/70 p-2 rounded-lg border border-forest-800">
+            <div class="text-[10px] uppercase text-forest-400">Unchanged</div>
+            <div id="metric-unchanged" class="text-base font-bold text-slate-300">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impacted Requirements Alert Banner -->
+      <div id="impacted-requirements-banner" class="hidden mb-6 bg-amber-950/30 border border-amber-500/40 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <div class="p-1.5 rounded-lg bg-amber-900/60 text-amber-300 mt-0.5">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-amber-200 uppercase tracking-wider">Change Impact Alert: Compliance Requirements Compromised</h3>
+            <p class="text-xs text-amber-300/80 mt-0.5">The following rules were grounded in clauses modified in this revision and have been automatically flagged for re-assessment:</p>
+            <div id="impacted-requirements-list" class="mt-2.5 space-y-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clause by Clause Diff View -->
+      <div class="space-y-4" id="diff-results-container">
+        <div class="text-center py-12 text-forest-400 text-xs">Click "Compare" above to inspect differences between contract versions.</div>
+      </div>
+    </div>
+
+    <!-- TAB 4: AUDIT TIMELINE -->
+    <div id="tab-content-audit" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <span>Cryptographic Audit Ledger</span>
+            <span class="text-xs text-forest-400 font-mono">(Append-Only via PostgreSQL Triggers)</span>
+          </h2>
+          <p class="text-xs text-forest-400">Chronological history of all uploads, evaluations, overrides, diffs, and sign-offs</p>
+        </div>
+        <button onclick="loadAuditTrail()" class="text-xs text-bronze-300 hover:text-bronze-200 flex items-center gap-1.5 bg-forest-900/80 border border-bronze-500/30 px-3 py-1.5 rounded-lg transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Refresh Ledger</span>
+        </button>
+      </div>
+
+      <div class="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-forest-800" id="audit-timeline-container">
+        <div class="text-center py-12 text-forest-400 text-xs">Loading audit ledger...</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: CREATE CONTRACT -->
+  <div id="new-contract-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl w-full max-w-md p-6 shadow-2xl border border-bronze-500/30">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <i data-lucide="file-plus" class="w-5 h-5 text-bronze-400"></i>
+          <span>Create Contract Container</span>
+        </h3>
+        <button onclick="closeModal('new-contract-modal')" class="text-slate-400 hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-forest-400 mb-1">Contract Title</label>
+          <input type="text" id="new-contract-title" placeholder="e.g. CloudScale Master Services Agreement" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+        </div>
+        <div>
+          <label class="block text-forest-400 mb-1">Vendor Name</label>
+          <input type="text" id="new-contract-vendor" placeholder="e.g. CloudScale Corp" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+        </div>
+        <div>
+          <label class="block text-forest-400 mb-1">Contract Type</label>
+          <select id="new-contract-type-select" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+            <option value="MSA">Master Services Agreement (MSA)</option>
+            <option value="NDA">Non-Disclosure Agreement (NDA)</option>
+            <option value="SLA">Service Level Agreement (SLA)</option>
+            <option value="DPA">Data Processing Agreement (DPA)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button onclick="closeModal('new-contract-modal')" class="text-xs px-3.5 py-2 rounded-lg bg-forest-900 text-slate-300 border border-forest-800">Cancel</button>
+        <button onclick="submitNewContract()" class="bronze-btn text-xs px-4 py-2 rounded-lg font-semibold">Create Contract</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE REQUIREMENT -->
+  <div id="new-requirement-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl w-full max-w-md p-6 shadow-2xl border border-bronze-500/30">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <i data-lucide="shield-plus" class="w-5 h-5 text-bronze-400"></i>
+          <span>Add Compliance Requirement</span>
+        </h3>
+        <button onclick="closeModal('new-requirement-modal')" class="text-slate-400 hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-forest-400 mb-1">Rule Title</label>
+          <input type="text" id="new-req-title" value="30-Day Termination Notice" placeholder="e.g. 30-Day Notice" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+        </div>
+        <div>
+          <label class="block text-forest-400 mb-1">Category</label>
+          <input type="text" id="new-req-category" value="Termination" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+        </div>
+        <div>
+          <label class="block text-forest-400 mb-1">Rule Description / Legal Condition</label>
+          <textarea id="new-req-desc" rows="3" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">Contract must provide at least thirty (30) days prior written notice for termination without cause.</textarea>
+        </div>
+        <div>
+          <label class="block text-forest-400 mb-1">Keywords for Deterministic FTS (comma separated)</label>
+          <input type="text" id="new-req-keywords" value="terminate, notice, days, written" class="w-full bg-forest-950 border border-forest-800 text-slate-200 rounded-lg p-2.5 outline-none focus:border-bronze-400">
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button onclick="closeModal('new-requirement-modal')" class="text-xs px-3.5 py-2 rounded-lg bg-forest-900 text-slate-300 border border-forest-800">Cancel</button>
+        <button onclick="submitNewRequirement()" class="bronze-btn text-xs px-4 py-2 rounded-lg font-semibold">Save Rule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // Global State
+    let contracts = [];
+    let activeContract = null;
+    let activeVersion = null;
+    let activeClauses = [];
+    let activeFindings = [];
+
+    // Initialize Dashboard
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await loadContracts();
+      await loadAuditTrail();
+    });
+
+    // 1. Load Contracts from Backend
+    async function loadContracts() {
+      try {
+        const res = await fetch('/api/v1/contracts');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("Failed to load contracts:", err);
+          document.getElementById('active-contract-title').innerText = "Backend Connection Issue";
+          document.getElementById('active-contract-vendor').innerText = (err.message || err.detail || "Server error loading contracts");
+          return;
+        }
+        const data = await res.json();
+        contracts = Array.isArray(data) ? data : [];
+        
+        document.getElementById('stat-contracts-count').innerText = contracts.length;
+        
+        let approvedCount = 0;
+        contracts.forEach(c => {
+          (c.versions || []).forEach(v => {
+            if (v.approval_status === 'APPROVED') approvedCount++;
+          });
+        });
+        document.getElementById('stat-approved-count').innerText = approvedCount;
+
+        const selector = document.getElementById('contract-selector');
+        selector.innerHTML = '<option value="">Select Contract...</option>' + 
+          contracts.map(c => `<option value="${c.id}">${c.title} (${c.vendor_name})</option>`).join('');
+
+        if (contracts.length > 0) {
+          // If activeContract still exists in the refreshed list, keep it
+          const keepId = activeContract && contracts.some(c => c.id === activeContract.id) ? activeContract.id : contracts[0].id;
+          selector.value = keepId;
+          await onContractSelected(keepId);
+        } else {
+          document.getElementById('active-contract-title').innerText = "No contracts found";
+          document.getElementById('active-contract-vendor').innerText = "Click 'New Contract' or 'Load Demo Contract' to begin.";
+          activeContract = null;
+          activeVersion = null;
+          renderVersionChips();
+        }
+      } catch (e) {
+        console.error("Error loading contracts:", e);
+        document.getElementById('active-contract-title').innerText = "Connection Error";
+        document.getElementById('active-contract-vendor').innerText = e.message;
+      }
+    }
+
+    // 1b. Seed Demo Sample Contract
+    async function seedDemoContract() {
+      const btn = document.getElementById('load-demo-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="animate-pulse">Loading Samples...</span>`;
+      try {
+        const res = await fetch('/api/v1/contracts/seed-demo', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(`Seed Error: ${data.detail || data.message || 'Server error'}`);
+          return;
+        }
+        await loadContracts();
+        if (data.contract_id) {
+          document.getElementById('contract-selector').value = data.contract_id;
+          await onContractSelected(data.contract_id);
+        }
+        await loadAuditTrail();
+      } catch (e) {
+        alert("Error loading demo: " + e.message);
+      } finally {
+        btn.innerHTML = originalText;
+        lucide.createIcons();
+      }
+    }
+
+    // 2. Select Contract
+    async function onContractSelected(contractId) {
+      if (!contractId) return;
+      activeContract = contracts.find(c => c.id === contractId);
+      if (!activeContract) return;
+
+      document.getElementById('active-contract-title').innerText = activeContract.title;
+      document.getElementById('active-contract-vendor').innerText = `Vendor: ${activeContract.vendor_name} • Created: ${new Date(activeContract.created_at).toLocaleDateString()}`;
+      document.getElementById('active-contract-type').innerText = activeContract.contract_type;
+
+      renderVersionChips();
+      updateDiffSelectors();
+    }
+
+    // 3. Render Version Chips
+    function renderVersionChips() {
+      const container = document.getElementById('version-chips-container');
+      const versions = activeContract.versions || [];
+
+      if (versions.length === 0) {
+        container.innerHTML = `<span class="text-xs text-forest-400">No versions uploaded yet. Click "Upload New Version" above.</span>`;
+        activeVersion = null;
+        renderVersionActionButtons();
+        renderClauses([]);
+        renderFindings([]);
+        return;
+      }
+
+      // Default to latest version if none selected
+      if (!activeVersion || !versions.find(v => v.id === activeVersion.id)) {
+        activeVersion = versions[0];
+      }
+
+      container.innerHTML = versions.map(v => {
+        const isSelected = v.id === activeVersion.id;
+        const isApproved = v.approval_status === 'APPROVED';
+        const badgeColor = isApproved ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40' : 'bg-amber-950/80 text-amber-300 border-amber-500/40';
+
+        return `
+          <button onclick="selectVersion('${v.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition ${isSelected ? 'bg-forest-800 text-bronze-200 border border-bronze-400/60 shadow-md' : 'bg-forest-950 text-slate-400 border border-forest-800 hover:border-forest-700'}">
+            <span>v${v.version_number}</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded border ${badgeColor}">${v.approval_status}</span>
+          </button>
+        `;
+      }).join('');
+
+      renderVersionActionButtons();
+      loadVersionData(activeVersion.id);
+    }
+
+    // 4. Render Action Buttons for Active Version
+    function renderVersionActionButtons() {
+      const actionsContainer = document.getElementById('version-actions-container');
+      if (!activeVersion) {
+        actionsContainer.innerHTML = '';
+        return;
+      }
+
+      const isApproved = activeVersion.approval_status === 'APPROVED';
+
+      actionsContainer.innerHTML = `
+        <button onclick="reEvaluateActiveVersion()" class="text-xs px-3 py-1.5 rounded-lg bg-forest-900/80 hover:bg-forest-850 text-slate-300 border border-forest-700/60 flex items-center gap-1.5 transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-bronze-400"></i>
+          <span>Re-evaluate AI</span>
+        </button>
+
+        ${isApproved ? `
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-mono">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+            <span>Signed & Approved</span>
+          </div>
+        ` : `
+          <button onclick="approveActiveVersion()" class="bronze-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow">
+            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+            <span>Approve Version v${activeVersion.version_number}</span>
+          </button>
+        `}
+      `;
+      lucide.createIcons();
+    }
+
+    // 5. Select Version
+    function selectVersion(versionId) {
+      activeVersion = activeContract.versions.find(v => v.id === versionId);
+      renderVersionChips();
+    }
+
+    // 6. Load Version Clauses & Findings
+    async function loadVersionData(versionId) {
+      if (!versionId) return;
+      try {
+        // Load clauses
+        const clauseRes = await fetch(`/api/v1/contracts/versions/${versionId}/clauses`);
+        if (clauseRes.ok) {
+          const data = await clauseRes.json();
+          activeClauses = Array.isArray(data) ? data : [];
+        } else {
+          activeClauses = [];
+        }
+        document.getElementById('tab-clause-count').innerText = activeClauses.length;
+        renderClauses(activeClauses);
+
+        // Load findings
+        const findRes = await fetch(`/api/v1/versions/${versionId}/findings`);
+        if (findRes.ok) {
+          const data = await findRes.json();
+          activeFindings = Array.isArray(data) ? data : [];
+        } else {
+          activeFindings = [];
+        }
+        document.getElementById('tab-finding-count').innerText = activeFindings.length;
+        renderFindings(activeFindings);
+      } catch (e) {
+        console.error("Error loading version data:", e);
+        activeClauses = [];
+        activeFindings = [];
+        renderClauses([]);
+        renderFindings([]);
+      }
+    }
+
+    // 7. Render Clauses List
+    function renderClauses(clausesList) {
+      const container = document.getElementById('clauses-list');
+      if (!clausesList || clausesList.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 text-forest-400 text-xs">No clauses extracted for this version.</div>`;
+        return;
+      }
+
+      container.innerHTML = clausesList.map(c => `
+        <div class="glass-card glass-card-hover rounded-xl p-4 transition">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-semibold text-bronze-300 bg-forest-950 px-2 py-0.5 rounded border border-bronze-500/20">Clause ${c.clause_index}</span>
+              ${c.section_title ? `<span class="text-xs font-semibold text-slate-200">${c.section_title}</span>` : ''}
+            </div>
+            <span class="text-[11px] text-forest-400 font-mono">Page ${c.page_number}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">${c.text_content}</p>
+        </div>
+      `).join('');
+    }
+
+    // 8. Filter Clauses
+    function filterClauses(query) {
+      const q = query.toLowerCase();
+      const filtered = activeClauses.filter(c => 
+        c.text_content.toLowerCase().includes(q) || 
+        (c.section_title && c.section_title.toLowerCase().includes(q))
+      );
+      renderClauses(filtered);
+    }
+
+    // 9. Render Findings List
+    function renderFindings(findingsList) {
+      const container = document.getElementById('findings-list');
+      if (!findingsList || findingsList.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 text-forest-400 text-xs">No findings recorded. Click "Re-evaluate AI" above.</div>`;
+        return;
+      }
+
+      container.innerHTML = findingsList.map(f => {
+        let statusBadge = '';
+        if (f.status === 'SATISFIED') {
+          statusBadge = '<span class="px-2 py-0.5 text-xs font-bold rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">SATISFIED</span>';
+        } else if (f.status === 'NEEDS_REVIEW') {
+          statusBadge = '<span class="px-2 py-0.5 text-xs font-bold rounded bg-amber-950/80 text-amber-300 border border-amber-500/40 animate-pulse">NEEDS_REVIEW</span>';
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 text-xs font-bold rounded bg-rose-950/80 text-rose-300 border border-rose-500/40">${f.status}</span>`;
+        }
+
+        return `
+          <div class="glass-card rounded-xl p-5 border ${f.status === 'NEEDS_REVIEW' ? 'border-amber-500/50' : 'border-bronze-500/20'}">
+            <div class="flex items-center justify-between gap-4 mb-3">
+              <div>
+                <span class="text-xs text-forest-400 font-mono uppercase">Rule Target</span>
+                <h3 class="text-sm font-bold text-slate-100">${f.requirement_title || 'Compliance Rule'}</h3>
+              </div>
+              <div class="flex items-center gap-3">
+                ${statusBadge}
+                ${f.confidence_score ? `<span class="text-xs font-mono text-bronze-400">${Math.round(f.confidence_score * 100)}% match</span>` : ''}
+              </div>
+            </div>
+
+            <!-- Evidence Quote Box -->
+            ${f.evidence_quote ? `
+              <div class="bg-forest-950/80 rounded-lg p-3 border-l-2 border-bronze-400 my-2.5">
+                <div class="text-[10px] uppercase font-mono text-bronze-400 mb-1">Grounded Evidence Quote ${f.clause_page ? `(Page ${f.clause_page})` : ''}</div>
+                <p class="text-xs italic text-slate-200">"${f.evidence_quote}"</p>
+              </div>
+            ` : ''}
+
+            <!-- Analysis Notes -->
+            <div class="text-xs text-slate-300 mt-2 flex items-start gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-forest-400 shrink-0 mt-0.5"></i>
+              <span>${f.analysis_notes || 'Evaluated via Hybrid Retrieval Pipeline.'}</span>
+            </div>
+
+            <!-- Reviewer Override Control -->
+            <div class="mt-3 pt-3 border-t border-forest-800/60 flex items-center justify-between text-xs">
+              <span class="text-[11px] text-forest-400">Review Status: <strong class="text-slate-200">${f.review_status}</strong></span>
+              <div class="flex items-center gap-2">
+                <button onclick="overrideFindingPrompt('${f.id}', 'SATISFIED')" class="px-2.5 py-1 rounded bg-forest-900 hover:bg-forest-850 text-emerald-300 border border-emerald-500/30 text-[11px] transition">Confirm Satisfied</button>
+                <button onclick="overrideFindingPrompt('${f.id}', 'NEEDS_REVIEW')" class="px-2.5 py-1 rounded bg-forest-900 hover:bg-forest-850 text-amber-300 border border-amber-500/30 text-[11px] transition">Flag Review</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // 10. Override Finding Prompt
+    async function overrideFindingPrompt(findingId, newStatus) {
+      const notes = prompt(`Provide Reviewer notes for setting status to ${newStatus}:`, "Confirmed by Reviewer");
+      if (!notes) return;
+
+      try {
+        const res = await fetch(`/api/v1/findings/${findingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus, analysis_notes: notes }),
+        });
+        if (res.ok) {
+          await loadVersionData(activeVersion.id);
+          await loadAuditTrail();
+        }
+      } catch (e) {
+        console.error("Error overriding finding:", e);
+      }
+    }
+
+    // 11. Approve Version Action
+    async function approveActiveVersion() {
+      if (!activeVersion) return;
+      const comments = prompt(`Reviewer Sign-Off Comments for Version v${activeVersion.version_number}:`, "All compliance requirements verified. Version officially approved.");
+      if (comments === null) return;
+
+      try {
+        const res = await fetch(`/api/v1/versions/${activeVersion.id}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ decision: 'APPROVED', comments: comments }),
+        });
+        if (res.ok) {
+          const apprData = await res.json();
+          alert(`Version v${apprData.version_number} Approved!\n\nCryptographic Seal Hash:\n${apprData.signature_hash}`);
+          await loadContracts();
+          await loadAuditTrail();
+        } else {
+          const err = await res.json();
+          alert(`Error: ${err.detail || 'Could not approve version'}`);
+        }
+      } catch (e) {
+        console.error("Error approving version:", e);
+      }
+    }
+
+    // 12. Re-Evaluate Version
+    async function reEvaluateActiveVersion() {
+      if (!activeVersion) return;
+      try {
+        const res = await fetch(`/api/v1/versions/${activeVersion.id}/evaluate`, { method: 'POST' });
+        if (res.ok) {
+          await loadVersionData(activeVersion.id);
+          alert("Evaluation complete! Findings updated.");
+        }
+      } catch (e) {
+        console.error("Error evaluating version:", e);
+      }
+    }
+
+    // 13. Upload Selected PDF File
+    async function uploadSelectedPDF(file) {
+      if (!file || !activeContract) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadBtn = document.querySelector('button[onclick*="pdf-file-input"]');
+      const originalText = uploadBtn.innerHTML;
+      uploadBtn.innerHTML = `<span class="animate-pulse">Extracting & Evaluating...</span>`;
+
+      try {
+        const res = await fetch(`/api/v1/contracts/${activeContract.id}/versions/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (res.ok) {
+          const newVer = await res.json();
+          alert(`Success! Uploaded Version v${newVer.version_number}\nSHA-256: ${newVer.sha256_checksum}\nClauses Extracted: ${newVer.clause_count}`);
+          await loadContracts();
+          selectVersion(newVer.id);
+          await loadAuditTrail();
+        } else {
+          const err = await res.json();
+          alert(`Upload Rejected: ${err.detail || 'Error uploading file'}`);
+        }
+      } catch (e) {
+        alert(`Upload Error: ${e.message}`);
+      } finally {
+        uploadBtn.innerHTML = originalText;
+        document.getElementById('pdf-file-input').value = '';
+      }
+    }
+
+    // 14. Diff Engine: Update Selectors
+    function updateDiffSelectors() {
+      const v1Sel = document.getElementById('diff-v1-select');
+      const v2Sel = document.getElementById('diff-v2-select');
+      const versions = activeContract?.versions || [];
+
+      const opts = versions.map(v => `<option value="${v.id}">v${v.version_number} (${v.approval_status})</option>`).join('');
+      v1Sel.innerHTML = opts;
+      v2Sel.innerHTML = opts;
+
+      if (versions.length >= 2) {
+        v1Sel.selectedIndex = 1; // v1
+        v2Sel.selectedIndex = 0; // v2
+      }
+    }
+
+    // 15. Run Diff Comparison
+    async function runDiffComparison() {
+      const v1Id = document.getElementById('diff-v1-select').value;
+      const v2Id = document.getElementById('diff-v2-select').value;
+      if (!v1Id || !v2Id || !activeContract) return;
+
+      try {
+        const res = await fetch(`/api/v1/contracts/${activeContract.id}/diff?source_version_id=${v1Id}&target_version_id=${v2Id}`);
+        const data = await res.json();
+
+        // Update metrics bar
+        document.getElementById('diff-metrics-bar').classList.remove('hidden');
+        document.getElementById('metric-additions').innerText = data.metrics.additions;
+        document.getElementById('metric-deletions').innerText = data.metrics.deletions;
+        document.getElementById('metric-modifications').innerText = data.metrics.modifications;
+        document.getElementById('metric-unchanged').innerText = data.metrics.unchanged;
+
+        // Render Impacted Requirements Banner
+        const impactBanner = document.getElementById('impacted-requirements-banner');
+        const impactList = document.getElementById('impacted-requirements-list');
+        if (data.impacted_requirements && data.impacted_requirements.length > 0) {
+          impactBanner.classList.remove('hidden');
+          impactList.innerHTML = data.impacted_requirements.map(imp => `
+            <div class="bg-amber-950/60 p-2.5 rounded-lg border border-amber-500/30 text-xs">
+              <div class="font-bold text-amber-200">Rule: ${imp.title} (${imp.category})</div>
+              <div class="text-amber-300/90 mt-0.5">${imp.impact_reason}</div>
+            </div>
+          `).join('');
+        } else {
+          impactBanner.classList.add('hidden');
+        }
+
+        // Render Clause Diff Cards
+        const diffContainer = document.getElementById('diff-results-container');
+        diffContainer.innerHTML = data.clause_diffs.map(c => {
+          let badge = '';
+          let cardBorder = 'border-forest-800';
+
+          if (c.change_type === 'MODIFIED') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-500/40">MODIFIED</span>';
+            cardBorder = 'border-amber-500/40 bg-amber-950/10';
+          } else if (c.change_type === 'ADDED') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">ADDED</span>';
+            cardBorder = 'border-emerald-500/40 bg-emerald-950/10';
+          } else if (c.change_type === 'REMOVED') {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-500/40">REMOVED</span>';
+            cardBorder = 'border-rose-500/40 bg-rose-950/10';
+          } else {
+            badge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-forest-950">UNCHANGED</span>';
+          }
+
+          return `
+            <div class="glass-card rounded-xl p-4 border ${cardBorder}">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono font-bold text-bronze-300">Clause ${c.clause_index}</span>
+                  ${c.section_title ? `<span class="text-xs font-semibold text-slate-200">${c.section_title}</span>` : ''}
+                </div>
+                ${badge}
+              </div>
+
+              ${c.change_type === 'MODIFIED' ? `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mt-3">
+                  <div class="bg-rose-950/20 p-3 rounded-lg border border-rose-900/40">
+                    <div class="text-[10px] uppercase font-mono text-rose-400 mb-1">v${data.source_version_number} Base Text</div>
+                    <p class="text-rose-200/90 leading-relaxed">${c.source_text}</p>
+                  </div>
+                  <div class="bg-emerald-950/20 p-3 rounded-lg border border-emerald-900/40">
+                    <div class="text-[10px] uppercase font-mono text-emerald-400 mb-1">v${data.target_version_number} Revised Text</div>
+                    <p class="text-emerald-200/90 leading-relaxed">${c.target_text}</p>
+                  </div>
+                </div>
+              ` : `
+                <p class="text-xs text-slate-300 leading-relaxed">${c.target_text || c.source_text}</p>
+              `}
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error("Error computing diff:", e);
+      }
+    }
+
+    // 16. Load Audit Trail
+    async function loadAuditTrail() {
+      try {
+        const res = await fetch('/api/v1/audit-trail?limit=40');
+        const container = document.getElementById('audit-timeline-container');
+        if (!res.ok) {
+          container.innerHTML = `<div class="text-center py-12 text-forest-400 text-xs">Failed to load audit logs.</div>`;
+          return;
+        }
+        const data = await res.json();
+        const logs = Array.isArray(data) ? data : [];
+
+        if (logs.length === 0) {
+          container.innerHTML = `<div class="text-center py-12 text-forest-400 text-xs">No audit logs recorded yet.</div>`;
+          return;
+        }
+
+        container.innerHTML = logs.map(l => {
+          let badgeColor = 'bg-forest-900 text-slate-300 border-forest-700';
+          if (l.action.includes('APPROVED')) badgeColor = 'bg-emerald-950 text-emerald-300 border-emerald-500/40';
+          if (l.action.includes('OVERRIDDEN')) badgeColor = 'bg-amber-950 text-amber-300 border-amber-500/40';
+          if (l.action.includes('DIFF')) badgeColor = 'bg-bronze-900/80 text-bronze-300 border-bronze-500/40';
+
+          return `
+            <div class="relative pl-6">
+              <span class="absolute left-[-21px] top-1.5 w-3 h-3 rounded-full bg-bronze-400 border-2 border-forest-950"></span>
+              <div class="glass-card rounded-xl p-3.5 border border-forest-800">
+                <div class="flex items-center justify-between gap-3 text-xs mb-1">
+                  <span class="font-bold font-mono px-2 py-0.5 rounded border text-[10px] ${badgeColor}">${l.action}</span>
+                  <span class="text-forest-400 font-mono text-[11px]">${new Date(l.created_at).toLocaleTimeString()} • ${new Date(l.created_at).toLocaleDateString()}</span>
+                </div>
+                <div class="text-xs text-slate-200 mt-1">
+                  <span class="text-forest-400">Actor:</span> <strong>${l.user_name || 'System'}</strong> on <span class="font-mono text-bronze-300">${l.entity_type}</span>
+                </div>
+                ${l.details && Object.keys(l.details).length > 0 ? `
+                  <pre class="bg-forest-950/80 p-2 rounded text-[11px] font-mono text-slate-400 mt-2 overflow-x-auto border border-forest-900">${JSON.stringify(l.details, null, 2)}</pre>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error("Error loading audit trail:", e);
+      }
+    }
+
+    // Modal Helpers
+    function openNewContractModal() { document.getElementById('new-contract-modal').classList.remove('hidden'); }
+    function openNewRequirementModal() { document.getElementById('new-requirement-modal').classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    async function submitNewContract() {
+      const title = document.getElementById('new-contract-title').value.trim();
+      const vendor = document.getElementById('new-contract-vendor').value.trim();
+      const type = document.getElementById('new-contract-type-select').value;
+      if (!title || !vendor) return alert("Please fill title and vendor");
+
+      try {
+        const res = await fetch('/api/v1/contracts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, vendor_name: vendor, contract_type: type }),
+        });
+        if (res.ok) {
+          const created = await res.json();
+          closeModal('new-contract-modal');
+          document.getElementById('new-contract-title').value = '';
+          document.getElementById('new-contract-vendor').value = '';
+          await loadContracts();
+          if (created && created.id) {
+            document.getElementById('contract-selector').value = created.id;
+            await onContractSelected(created.id);
+          }
+          await loadAuditTrail();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          alert(`Error: ${err.message || err.detail || 'Failed to create contract'}`);
+        }
+      } catch (e) {
+        alert(`Error: ${e.message}`);
+      }
+    }
+
+    async function submitNewRequirement() {
+      const title = document.getElementById('new-req-title').value.trim();
+      const category = document.getElementById('new-req-category').value.trim();
+      const desc = document.getElementById('new-req-desc').value.trim();
+      const kw = document.getElementById('new-req-keywords').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      try {
+        const res = await fetch('/api/v1/requirements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, category, description: desc, search_keywords: kw }),
+        });
+        if (res.ok) {
+          closeModal('new-requirement-modal');
+          alert("Rule created!");
+          if (activeVersion) await reEvaluateActiveVersion();
+        }
+      } catch (e) {
+        alert(`Error: ${e.message}`);
+      }
+    }
+
+    // Tab Navigation Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-bronze-400', 'text-bronze-300', 'bg-forest-900/40');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      activeBtn.classList.remove('border-transparent', 'text-slate-400');
+      activeBtn.classList.add('border-bronze-400', 'text-bronze-300', 'bg-forest-900/40');
+      
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

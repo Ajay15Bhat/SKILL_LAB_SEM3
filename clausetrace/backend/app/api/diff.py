@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.user_helper import ensure_demo_users
 from app.models.audit import AuditLog
 from app.models.base import AuditAction
 from app.models.contract import ContractVersion
@@ -30,6 +31,7 @@ async def get_version_diff(
     - Identifies which compliance requirements are impacted by modified clauses.
     - Flags impacted requirements in target version for mandatory re-review.
     """
+    await ensure_demo_users(db)
     # 1. Verify both versions exist and belong to the contract
     v1 = await db.get(ContractVersion, source_version_id)
     v2 = await db.get(ContractVersion, target_version_id)
